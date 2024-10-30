@@ -1,0 +1,131 @@
+###########Waypoint manager
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Tile {
+    public bool IsWalkable; // If the tile can be walked on
+    public int Weight; // Cost to move onto this tile
+    public Vector3 centerPosition;
+}
+
+public class GridWaypointManager : MonoBehaviour {
+    public int gridWidth;
+    public int gridHeight;
+    public float tileSize;
+    
+    private 
+    private List<Tile> currentWaypoints;
+    private Tile[,] grid; // 2D array to represent the grid
+
+    void Start() {
+	    gridWidth = 10;
+	    gridHeight = 10;
+	    tileSize = 1;
+        grid = new Tile[gridWidth, gridHeight];
+        for (int x = 0; x < gridWidth; x++) {
+            for (int y = 0; y < gridHeight; y++) {
+                grid[x, y] = new Tile {
+                    IsWalkable = true,// You can change this based on tower placement
+                    Weight = 1; // Default weight
+                }
+            }
+        }
+    }
+
+    // Method to update tile state (blocked/unblocked)
+    // May expand later if needed
+    public void UpdateTileState(int x, int y, bool isWalkable) {
+        if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
+            grid[x, y].IsWalkable = isWalkable;
+        }
+    }
+
+    private Tile GetTileFromWorldPosition(Vector3 position) {
+    	int x = Mathf.FloorToInt(position.x / tileSize);
+    	int y = Mathf.FloorToInt(position.z / tileSize); // Assuming z-axis is used for height
+    	return grid[x, y];
+    }
+
+    // public method for enemies to pull the waypoints of generated path
+    public List<Vector3> GetWaypoints(Vector3 start, Vector3 end) {
+        return currentWaypoints;        
+    }
+
+    private Tile GetTileCost(List<Tile> openSet) {
+        Tile lowest = openSet[0];
+        foreach (Tile tile in openSet) {
+            
+            if (getWeight(tile) < getWeight(lowest)) {
+                lowest = tile;
+            }
+        }
+        return lowest;
+    }
+    private int getWeight(Tile tile){
+
+    }
+
+    private List<Vector3> AStar(Vector3 start, Vector3 end) {
+    	List<Tile> openSet = new List<Tile>();
+    	HashSet<Tile> closedSet = new HashSet<Tile>();
+    
+    	// Convert world position to grid coordinates
+   	    Tile startTile = GetTileFromWorldPosition(start);
+    	Tile endTile = GetTileFromWorldPosition(end);
+    
+    	openSet.Add(startTile);
+    
+    	while (openSet.Count > 0) {
+        	Tile currentTile = GetLowestFCostTile(openSet, endTile);
+        
+        	if (currentTile == endTile) {
+            		return RetracePath();
+        	}
+
+            openSet.Remove(currentTile);
+            closedSet.Add(currentTile);
+
+            foreach (Tile neighbor in GetNeighbors(currentTile)) {
+                if (!neighbor.IsWalkable || closedSet.Contains(neighbor)) {
+                    continue; // Skip if not walkable or already evaluated
+                }
+                
+                int newCostToNeighbor = currentTile.Weight + neighbor.Weight;
+
+                if (newCostToNeighbor < neighbor.Weight || !openSet.Contains(neighbor)) {
+                    neighbor.Weight = newCostToNeighbor;
+                    // Optionally store parent for path retracing
+                    if (!openSet.Contains(neighbor)) {
+                        openSet.Add(neighbor);
+                    }
+                }
+            }
+        }
+        return new List<Vector3>(); // Return an empty path if no path is found
+    }
+
+// Tile class to represent each grid cell
+
+
+2. A Algorithm Implementation*
+
+The A* algorithm will find the shortest path from the start point to the end point. Here’s a simplified outline of how you can implement it:
+
+csharp
+
+// Helper methods to get tiles, neighbors, and retrace the path
+
+
+
+
+private List<Vector3> RetracePath(Tile startTile, Tile endTile) {
+    List<Vector3> path = new List<Vector3>();
+    // Retrace steps from endTile back to startTile and add positions to path
+    return path;
+}
+
+private List<Tile> GetNeighbors(Tile tile) {
+    List<Tile> neighbors = new List<Tile>();
+    // Get neighboring tiles (implement bounds checking)
+    return neighbors;
+}

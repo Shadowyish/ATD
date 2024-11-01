@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
-    public GridManager gridManager;            // Reference to the GridManager for pathfinding and tile data
-    public EnemySpawner enemySpawner;          // Reference to the EnemySpawner to handle waves of enemies
+    public waypointManager waypointManager;            // Reference to the GridManager for pathfinding and tile data
+    public EnemyManager enemyManager;          // Reference to the EnemySpawner to handle waves of enemies
     public TowerManager towerManager;          // Reference to the TowerManager to handle tower placement and upgrades
     public int waveNumber = 1;                 // Tracks the current wave number
 

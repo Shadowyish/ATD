@@ -12,7 +12,7 @@ public class GridWaypointManager : MonoBehaviour {
     [SerializeField] private float tileSize;
     private List<Vector3> currentWaypoints;
     private Tile[,] grid; // 2D array to represent the grid
-    private Tile main_tower;
+    private Tile mainTower;
 
     void Start() {
 	    gridWidth = 10;
@@ -45,7 +45,7 @@ public class GridWaypointManager : MonoBehaviour {
     private Tile GetTileFromWorldPosition(Vector3 position) {
     	int x = Mathf.FloorToInt(position.x / tileSize);
     	int y = Mathf.FloorToInt(position.y / tileSize);
-    	return grid[x, y];
+    	return grid[x, y]; 
     }
     private Tile GetLowestFCostTile(List<Tile> list) {
         Tile lowest = list[0];
@@ -60,48 +60,65 @@ public class GridWaypointManager : MonoBehaviour {
     private int getWeight(Tile tile){
         return tile.weight + abs((main_tower.centerPosition.x - tile.centerPosition.x) + (main_tower.centerPosition.y - tile.centerPosition.y));
     }
-    //TODO: Implement
     private List<Tile> GetNeighbors(Tile tile) {
         List<Tile> neighbors = new List<Tile>();
-        // Get neighboring tiles (implement bounds checking)
+        // Get tile's current grid coordinates
+        int x = Mathf.FloorToInt((tile.centerPosition.x) / tileSize);
+        int y = Mathf.FloorToInt((tile.centerPosition.y) / tileSize);
+
+        // Define potential neighboring positions (4-directional: up, down, left, right)
+        int[,] directions = new int[,] { { 0, 1 }, { 0, -1 }, { 1, 0 }, { -1, 0 } };
+
+        for (int i = 0; i < directions.GetLength(0); i++) {
+            int neighborX = x + directions[i, 0];
+            int neighborY = y + directions[i, 1];
+
+            // Bounds checking
+            if (neighborX >= 0 && neighborX < gridWidth && neighborY >= 0 && neighborY < gridHeight) {
+                Tile neighborTile = grid[neighborX, neighborY];
+                if (neighborTile.IsWalkable) {  // Only consider walkable tiles
+                    neighbors.Add(neighborTile);
+                }
+            }
+        }
         return neighbors;
     }
     private AStar(Vector3 start, Vector3 end) {
-    	List<Tile> ToVisit = new List<Tile>();
-    	HashSet<Tile> closedSet = new HashSet<Tile>();
+    	List<Tile> toVisit = new List<Tile>();
+    	HashSet<Tile> visited = new HashSet<Tile>();
         Stack<Tile> pathTiles = new Stack<Tile>();
     
     	// Convert world position to grid coordinates
    	    Tile startTile = GetTileFromWorldPosition(start);
-    	Tile endTile = GetTileFromWorldPosition(end);
     
-    	ToVisit.Add(startTile);
-    
-    	while (ToVisit.Count > 0) {
-        	Tile currentTile = GetLowestFCostTile(ToVisit, endTile);
-        
-        	if (currentTile == endTile) {
+    	toVisit.Add(startTile);
+
+    	while (toVisit.Count > 0) {
+        	Tile currentTile = GetLowestFCostTile(toVisit, endTile);
+
+        	if (currentTile == mainTower) {
             	currentWaypoints.Clear();                
                 while(pathTiles.Count !=0){
                     currentWaypoints.Add(pathTiles.pop());
                 }
         	}
 
-            ToVisit.Remove(currentTile);
-            closedSet.Add(currentTile);
-            PathTiles.push(currentTile);
+            toVisit.Remove(currentTile);
+            visited.Add(currentTile);
+            pathTiles.push(currentTile);
 
+            //check all the neighbor tiles for nodes to add/update.
             foreach (Tile neighbor in GetNeighbors(currentTile)) {
-                if (!neighbor.IsWalkable || closedSet.Contains(neighbor)) {
+                if (!neighbor.IsWalkable || visited.Contains(neighbor)) {
                     continue; // Skip if not walkable or already evaluated
                 }
                 
                 int newCostToNeighbor = getWeight(currentTile) + getWeight(neighbor.Weight);
-
-                if (newCostToNeighbor < getWeight(neighbor) || !ToVisit.Contains(neighbor)) {
+                //update old weight on unwalked node if better one found
+                if (newCostToNeighbor < getWeight(neighbor) || !toVisit.Contains(neighbor)) {
                     neighbor.Weight = newCostToNeighbor;
-                    if (!ToVisit.Contains(neighbor)) {
-                        ToVisit.Add(neighbor);
+                    if (!toVisit.Contains(neighbor)) {
+                        toVisit.Add(neighbor);
                     }
                 }
             }

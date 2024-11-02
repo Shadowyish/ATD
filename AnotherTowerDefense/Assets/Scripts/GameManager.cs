@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
-    public waypointManager waypointManager;            // Reference to the GridManager for pathfinding and tile data
-    public EnemyManager enemyManager;          // Reference to the EnemySpawner to handle waves of enemies
-    public TowerManager towerManager;          // Reference to the TowerManager to handle tower placement and upgrades
-    public int waveNumber = 1;                 // Tracks the current wave number
-
-    private List<Tile> currentPath;            // Stores the current path for enemy movement
-
-    // Game phases
+    [SerializeField] private GridWaypointManager waypointManager;
+    [SerializeField] private EnemyManager enemyManager;
+    [SerializeField] private TowerManager towerManager;
+    private int waveNumber = 1;   // Tracks the current wave number
+    
     public enum GamePhase { GeneratePath, BuildPhase, WavePhase }
     public GamePhase currentPhase;
 
+
+    //https://docs.unity3d.com/6000.0/Documentation/Manual/coroutines.html
+    //https://docs.unity3d.com/ScriptReference/Coroutine.html
     private void Start() {
         currentPhase = GamePhase.GeneratePath;
         StartCoroutine(GameLoop());
@@ -43,25 +43,21 @@ public class GameManager : MonoBehaviour {
     }
 
     private IEnumerator GeneratePath() {
-        // Generate the enemy path using A* (handled by the GridManager)
-        currentPath = gridManager.GenerateEnemyPath();
+        // Generate the enemy path using A* (handled by the waypointManager)
+        waypointManager.GenerateEnemyPath();
 
-        // Visualize the path if needed, for player information
-        gridManager.DisplayPath(currentPath);
-
-        yield return null;  // Path generation happens instantly in this example
+        // TODO: Visualize the path, for player information
+        yield return null;
     }
 
     private IEnumerator BuildPhase() {
         // Allow the player to place towers in valid locations
-        towerManager.StartPlacementMode();
+        towerManager.StartPlacementMode(waypointManager);
 
         // Wait for player confirmation (e.g., a button press to end the build phase)
         while (!towerManager.IsPlacementConfirmed()) {
             yield return null;
         }
-
-        // End the build phase
         towerManager.EndPlacementMode();
 
         yield return null;
@@ -69,14 +65,13 @@ public class GameManager : MonoBehaviour {
 
     private IEnumerator SpawnWave() {
         // Trigger enemy spawning for the current wave
-        enemySpawner.SpawnWave(currentPath, waveNumber);
+        enemySpawner.SpawnWave(waypointManager.GetWaypoints(), waveNumber);
 
         // Wait until all enemies are defeated or reach the endpoint
-        while (enemySpawner.AreEnemiesAlive()) {
+        while (enemySpawner.IsEnemiesAlive()) {
             yield return null;
         }
-
-        // Wave has ended
+        enemySpawner.StopWaves();
         yield return null;
     }
 }

@@ -38,7 +38,7 @@ public class GridWaypointManager : MonoBehaviour {
         }
     }
     // public method for enemies to pull the waypoints of generated path
-    public List<Vector3> GetWaypoints(Vector3 start, Vector3 end) {
+    public List<Vector3> GetWaypoints() {
         return currentWaypoints;        
     }
     // Need a fix for this/ double check works TODO::
@@ -99,7 +99,7 @@ public class GridWaypointManager : MonoBehaviour {
         	if (currentTile == mainTower) {
             	currentWaypoints.Clear();                
                 while(pathTiles.Count !=0){
-                    currentWaypoints.Add(pathTiles.pop());
+                    currentWaypoints.Add(pathTiles.pop().centerPosition);
                 }
         	}
 

@@ -65,12 +65,13 @@ public class GameManager : MonoBehaviour {
 
     private IEnumerator SpawnWave() {
         // Trigger enemy spawning for the current wave
-        enemySpawner.SpawnWave(waypointManager.GetWaypoints(), waveNumber);
+        enemySpawner.StartWaves(waypointManager.GetWaypoints(), waveNumber);
 
         // Wait until all enemies are defeated or reach the endpoint
         while (enemySpawner.IsEnemiesAlive()) {
             yield return null;
         }
+        //Stop spawner coroutine
         enemySpawner.StopWaves();
         yield return null;
     }

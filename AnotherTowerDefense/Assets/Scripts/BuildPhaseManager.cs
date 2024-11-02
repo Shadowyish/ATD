@@ -6,9 +6,8 @@ public class BuildPhaseManager : MonoBehaviour {
     private bool isPlacementActive = false;
     private bool isPlacementConfirmed = false;
     private GridWaypointManager gridManager;
-    void Start() {
-    }
 
+    //Load UI and Placement Visualizations
     public void StartPlacementMode(GridWaypointManager gridManager) {
         isPlacementActive = true;
         isPlacementConfirmed = false;
@@ -24,6 +23,7 @@ public class BuildPhaseManager : MonoBehaviour {
         }
     }
 
+    //Load UI screen for Tower Selection
     private void SelectTower() {
         // For now, pick a random tower
         int randomIndex = Random.Range(0, towerPrefabs.Count);
@@ -60,6 +60,7 @@ public class BuildPhaseManager : MonoBehaviour {
     public bool IsPlacementConfirmed() {
         return isPlacementConfirmed;
     }
+
     //shell function will use to end placement UI to trasition to wave UI
     public void EndPlacementMode() {
         isPlacementActive = false;

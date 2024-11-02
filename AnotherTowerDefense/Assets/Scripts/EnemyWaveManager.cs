@@ -4,22 +4,21 @@ using UnityEngine;
 public class EnemyWaveManager : MonoBehaviour{   
     [SerializeField] private List<GameObject> enemyPrefabs; 
     [SerializeField] private float timeBetweenWaves = 5f; // Time between each wave
-    [SerializeField] private Transform spawnPoint; // Point where enemies will spawn
 
     private List<GameObject> currentEnemyList;
-    private int currentWave;// Tracks the current wave number
+    private int currentWave;
     private int totalWaves; // tracks max waves for this stage
-    private bool isSpawning = false; // Flag to control spawning
-    private int totalEnemies; // total enemy count for this stage
+    private bool isSpawning = false;
+    private int totalEnemies;
     private int enemiesPerWave;// max number of enemies per wave
     private List<Vector3> currentWaypoints;
 
     public void StartWaves(List<Vector3> waypoints, int waveNumber){
         if (!isSpawning){
             currentWave = 0;
-            totalWaves = 1 + waveNumber;
-            totalEnemies = Math.Ceiling(waveNumber * waveNumber + totalWaves / 3);
-            enemiesPerWave = totalEnemies/totalWaves;
+            totalWaves = 1 + waveNumber; // x = y + 1
+            totalEnemies = Math.Ceiling(waveNumber * waveNumber /3 + totalWaves); // 1/3y^2 + (y+1)
+            enemiesPerWave = Math.FloorToInt(totalEnemies/totalWaves); // (1/3y^2 + (y+1)) / (y+1)
             isSpawning = true; // Prevent multiple calls
             currentWaypoints = waypoints;
             populateEnemyList(totalEnemies);
@@ -42,7 +41,6 @@ public class EnemyWaveManager : MonoBehaviour{
             }
             yield return new WaitForSeconds(timeBetweenWaves); // Delay before the next wave
             if(currentWave >= totalWaves)isSpawning = false;
-            
         }
     }
 

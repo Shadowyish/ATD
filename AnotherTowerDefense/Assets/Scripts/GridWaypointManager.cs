@@ -6,18 +6,17 @@ public class Tile {
     public int weight; // Cost to move onto this tile
     public Vector3 centerPosition;
 }
+
+// Grid tiles are calculated from the 0,0 of this object, make sure this object is placed on world origin
 public class GridWaypointManager : MonoBehaviour {
-    [SerializeField] private int gridWidth;
-    [SerializeField] private int gridHeight;
-    [SerializeField] private float tileSize;
+    [SerializeField] private int gridWidth = 10;
+    [SerializeField] private int gridHeight = 10;
+    [SerializeField] private float tileSize = 1;
     private List<Vector3> currentWaypoints;
     private Tile[,] grid; // 2D array to represent the grid
     private Tile mainTower;
 
     void Start() {
-	    gridWidth = 10;
-	    gridHeight = 10;
-	    tileSize = 1;
         grid = new Tile[gridWidth, gridHeight];
         for (int x = 0; x < gridWidth; x++) {
             for (int y = 0; y < gridHeight; y++) {
@@ -37,16 +36,19 @@ public class GridWaypointManager : MonoBehaviour {
             grid[x, y].IsWalkable = isWalkable;
         }
     }
+
     // public method for enemies to pull the waypoints of generated path
     public List<Vector3> GetWaypoints() {
         return currentWaypoints;        
     }
+
     // Need a fix for this/ double check works TODO::
     private Tile GetTileFromWorldPosition(Vector3 position) {
     	int x = Mathf.FloorToInt(position.x / tileSize);
     	int y = Mathf.FloorToInt(position.y / tileSize);
     	return grid[x, y]; 
     }
+
     private Tile GetLowestFCostTile(List<Tile> list) {
         Tile lowest = list[0];
         foreach (Tile tile in list) {
@@ -57,9 +59,11 @@ public class GridWaypointManager : MonoBehaviour {
         }
         return lowest;
     }
+
     private int getWeight(Tile tile){
         return tile.weight + abs((main_tower.centerPosition.x - tile.centerPosition.x) + (main_tower.centerPosition.y - tile.centerPosition.y));
     }
+
     private List<Tile> GetNeighbors(Tile tile) {
         List<Tile> neighbors = new List<Tile>();
         // Get tile's current grid coordinates
@@ -83,6 +87,7 @@ public class GridWaypointManager : MonoBehaviour {
         }
         return neighbors;
     }
+
     private AStar(Vector3 start, Vector3 end) {
     	List<Tile> toVisit = new List<Tile>();
     	HashSet<Tile> visited = new HashSet<Tile>();
@@ -94,11 +99,13 @@ public class GridWaypointManager : MonoBehaviour {
     	toVisit.Add(startTile);
 
     	while (toVisit.Count > 0) {
+            //pull next best tile from non-visited to explore
         	Tile currentTile = GetLowestFCostTile(toVisit, endTile);
 
         	if (currentTile == mainTower) {
             	currentWaypoints.Clear();                
                 while(pathTiles.Count !=0){
+                    //Retrace path: Might need to change, think this returns reversed path
                     currentWaypoints.Add(pathTiles.pop().centerPosition);
                 }
         	}

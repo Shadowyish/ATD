@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyWaveManager : MonoBehaviour{   
@@ -17,11 +19,11 @@ public class EnemyWaveManager : MonoBehaviour{
         if (!isSpawning){
             currentWave = 0;
             totalWaves = 1 + waveNumber; // x = y + 1
-            totalEnemies = Math.Ceiling(waveNumber * waveNumber /3 + totalWaves); // 1/3y^2 + (y+1)
-            enemiesPerWave = Math.FloorToInt(totalEnemies/totalWaves); // (1/3y^2 + (y+1)) / (y+1)
+            totalEnemies = (int)Math.Ceiling((float)(waveNumber * waveNumber /3 + totalWaves)); // 1/3y^2 + (y+1)
+            enemiesPerWave = Mathf.FloorToInt(totalEnemies/totalWaves); // (1/3y^2 + (y+1)) / (y+1)
             isSpawning = true; // Prevent multiple calls
             currentWaypoints = waypoints;
-            populateEnemyList(totalEnemies);
+            PopulateEnemyList(totalEnemies);
             StartCoroutine(SpawnWaves());
         }
     }
@@ -31,7 +33,14 @@ public class EnemyWaveManager : MonoBehaviour{
         isSpawning = false;
         StopCoroutine(SpawnWaves());
     }
-
+    public bool IsEnemiesAlive(){
+        foreach(GameObject enemy in currentEnemyList){
+            if(enemy != null){
+                return true;
+            }
+        }
+        return false;
+    }
     private IEnumerator SpawnWaves(){
         while (isSpawning){
             currentWave++;
@@ -52,8 +61,8 @@ public class EnemyWaveManager : MonoBehaviour{
         // Instantiate the enemy at the first waypoint and set its rotation
         // Take the instiated object and replace the prefab with it
         currentEnemyList[enemiesPerWave * currentWave + enemyInWave] = Instantiate(
-            currentEnemyList[enemiesPerWave * currentWave + enemyInWave], 
-            spawnPosition, 
+            currentEnemyList[enemiesPerWave * currentWave + enemyInWave],
+            spawnPosition,
             rotation);
     }
 
@@ -65,13 +74,5 @@ public class EnemyWaveManager : MonoBehaviour{
             //add the prefab to the list       
             currentEnemyList.Add(enemy);
         }
-    }
-    private bool IsEnemiesAlive(){
-        foreach(GameObject enemy: currentEnemyList){
-            if(enemy != null){
-                return true;
-            }
-        }
-        return false;
     }
 }

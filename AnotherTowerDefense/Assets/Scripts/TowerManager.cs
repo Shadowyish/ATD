@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tower : MonoBehaviour
+public class TowerManager : MonoBehaviour
 {
     [SerializeField] private float fireRate = 1f;// Number of seconds between attacks
     [SerializeField] private int damage = 10;// Damage per attack
     [SerializeField] private float range = 5f;// Range within which the tower can attack
     private float fireCountdown = 0f;// Time remaining before next attack
-    private Enemy target;
-    private List<Enemy> enemiesInRange = new List<Enemy>();
+    private GameObject target;
+    private List<GameObject> enemiesInRange = new List<GameObject>();
 
     void Start(){
     }
@@ -31,9 +31,9 @@ public class Tower : MonoBehaviour
     // Find and set the target based on enemies in range
     void UpdateTarget(){
         float shortestDistance = Mathf.Infinity;
-        Enemy nearestEnemy = null;
+        GameObject nearestEnemy = null;
 
-        foreach (Enemy enemy in enemiesInRange){
+        foreach (GameObject enemy in enemiesInRange){
             float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
             if (distanceToEnemy < shortestDistance){
                 shortestDistance = distanceToEnemy;
@@ -42,7 +42,7 @@ public class Tower : MonoBehaviour
         }
 
         if (nearestEnemy != null && shortestDistance <= range){
-            target = nearestEnemy.transform;
+            target = nearestEnemy;
         }
         else{
             target = null;
@@ -50,12 +50,12 @@ public class Tower : MonoBehaviour
     }
 
     void Shoot(){
-        target.dealDamage(damage);    
+        target.GetComponent<EnemyManager>().TakeDamage(damage);    
     }
 
     // Detect enemies entering range
     private void OnTriggerEnter(Collider other){
-        Enemy enemy = other.GetComponent<Enemy>();
+        GameObject enemy = other.GetComponent<GameObject>();
         if (enemy != null){
             enemiesInRange.Add(enemy);
         }
@@ -63,7 +63,7 @@ public class Tower : MonoBehaviour
 
     // Remove enemies that exit range
     private void OnTriggerExit(Collider other){
-        Enemy enemy = other.GetComponent<Enemy>();
+        GameObject enemy = other.GetComponent<GameObject>();
         if (enemy != null){
             enemiesInRange.Remove(enemy);
         }

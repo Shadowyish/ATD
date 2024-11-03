@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
     [SerializeField] private GridWaypointManager waypointManager;
-    [SerializeField] private EnemyManager enemyManager;
-    [SerializeField] private TowerManager towerManager;
+    [SerializeField] private EnemyWaveManager enemySpawner;
+    [SerializeField] private BuildPhaseManager towerManager;
     private int waveNumber = 1;   // Tracks the current wave number
     
     public enum GamePhase { GeneratePath, BuildPhase, WavePhase }
@@ -45,8 +45,6 @@ public class GameManager : MonoBehaviour {
     private IEnumerator GeneratePath() {
         // Generate the enemy path using A* (handled by the waypointManager)
         waypointManager.GenerateEnemyPath();
-
-        // TODO: Visualize the path, for player information
         yield return null;
     }
 

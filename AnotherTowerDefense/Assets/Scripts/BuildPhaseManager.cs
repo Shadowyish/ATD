@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class BuildPhaseManager : MonoBehaviour {
     [SerializeField] private List<GameObject> towerPrefabs; 
@@ -46,7 +47,7 @@ public class BuildPhaseManager : MonoBehaviour {
     private void PlaceTower(Tile tile) {
         // Instantiate tower prefab and set position
         Vector3 position = tile.centerPosition;
-        GameObject newTower = Instantiate(selectedtowerPrefab, position, Quaternion.identity);
+        GameObject newTower = Instantiate(selectedTowerPrefab, position, Quaternion.identity);
         tile.IsWalkable = false; // Mark tile as blocked for pathfinding
     }
 

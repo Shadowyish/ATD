@@ -1,6 +1,7 @@
 using UnityEngine;
+using System.Collections.Generic;
 
-public class EnemyController : MonoBehaviour {
+public class EnemyManager : MonoBehaviour {
     [SerializeField] private float speed = 1f; // Movement speed of the enemy
     [SerializeField] private int health = 10; // Health of the enemy
     private Vector3 target; // The target position index for the enemy to move toward
@@ -11,7 +12,7 @@ public class EnemyController : MonoBehaviour {
     void Update() {
         if (isAlive) {
             MoveTowardsTarget();
-        }else(Die())
+        }else Die();
     }
 
     public void SetTarget(Vector3 targetPosition) {
@@ -39,7 +40,7 @@ public class EnemyController : MonoBehaviour {
     }
 
     private void ReachTarget() {
-        if(target + 1 >= waypoints.GetLength()){
+        if(targetIndex + 1 >= waypoints.Count){
             // Deal damage to main tower = to remaining health
             Destroy(gameObject); // Destroy the enemy object upon reaching the target
         }else{

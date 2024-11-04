@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BuildPhaseManager.cs" />
+    <Compile Include="Assets\Scripts\MainTowerManager.cs" />
     <Compile Include="Assets\Scripts\TowerManager.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\GridWaypointManager.cs" />

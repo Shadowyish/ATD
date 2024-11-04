@@ -35,8 +35,8 @@ public class GameManager : MonoBehaviour {
 
                 case GamePhase.WavePhase:
                     yield return StartCoroutine(SpawnWave());
-                    waveNumber++;
                     currentPhase = GamePhase.GeneratePath;
+                    waveNumber++;
                     break;
             }
             yield return null;

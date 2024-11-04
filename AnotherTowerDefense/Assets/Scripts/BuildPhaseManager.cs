@@ -13,14 +13,12 @@ public class BuildPhaseManager : MonoBehaviour {
         isPlacementActive = true;
         isPlacementConfirmed = false;
         this.gridManager = gridManager;
+        SelectTower();
     }
 
     void Update() {
         if (isPlacementActive) {
             HandleTowerPlacement();
-            if (Input.GetKeyDown(KeyCode.Space)) {
-                ConfirmPlacement();
-            }
         }
     }
 
@@ -37,9 +35,10 @@ public class BuildPhaseManager : MonoBehaviour {
         if (Input.GetMouseButtonDown(0)) {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Tile targetTile = gridManager.GetTileFromWorldPosition(mousePosition);
-
-            if (targetTile != null && targetTile.IsWalkable) {
+            //TODO: Vizualize Space Selected
+            if(targetTile != null && targetTile.IsWalkable) {
                 PlaceTower(targetTile);
+                ConfirmPlacement();
             }
         }
     }

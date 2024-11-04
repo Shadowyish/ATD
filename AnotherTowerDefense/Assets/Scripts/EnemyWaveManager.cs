@@ -7,7 +7,7 @@ public class EnemyWaveManager : MonoBehaviour{
     [SerializeField] private List<GameObject> enemyPrefabs; 
     [SerializeField] private float timeBetweenWaves = 5f; // Time between each wave
 
-    private List<GameObject> currentEnemyList;
+    private List<GameObject> currentEnemyList = new List<GameObject>();
     private int currentWave;
     private int totalWaves; // tracks max waves for this stage
     private bool isSpawning = false;
@@ -18,9 +18,12 @@ public class EnemyWaveManager : MonoBehaviour{
     public void StartWaves(List<Vector3> waypoints, int waveNumber){
         if (!isSpawning){
             currentWave = 0;
-            totalWaves = 1 + waveNumber; // x = y + 1
-            totalEnemies = (int)Math.Ceiling((float)(waveNumber * waveNumber /3 + totalWaves)); // 1/3y^2 + (y+1)
-            enemiesPerWave = Mathf.FloorToInt(totalEnemies/totalWaves); // (1/3y^2 + (y+1)) / (y+1)
+            totalWaves = Math.Max(1, waveNumber - UnityEngine.Random.Range(2, waveNumber));
+            totalEnemies = waveNumber * 2 + totalWaves * totalWaves; // 2x + y^2
+            enemiesPerWave = Mathf.FloorToInt(totalEnemies/totalWaves); // 2x+y^2 / y
+
+            //Ensure that enemies are locked to prevent lack of/too many for array indexing
+            totalEnemies = enemiesPerWave * totalWaves; 
             isSpawning = true; // Prevent multiple calls
             currentWaypoints = waypoints;
             PopulateEnemyList(totalEnemies);
@@ -43,12 +46,12 @@ public class EnemyWaveManager : MonoBehaviour{
     }
     private IEnumerator SpawnWaves(){
         while (isSpawning){
-            currentWave++;
             for (int i = 0; i < enemiesPerWave; i++){
                 SpawnEnemy(i);
                 yield return new WaitForSeconds(1f); // Delay between enemy spawns
             }
             yield return new WaitForSeconds(timeBetweenWaves); // Delay before the next wave
+            currentWave++;
             if(currentWave >= totalWaves)isSpawning = false;
         }
     }

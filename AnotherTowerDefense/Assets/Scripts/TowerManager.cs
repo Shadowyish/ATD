@@ -10,8 +10,9 @@ public class TowerManager : MonoBehaviour
     private float fireCountdown = 0f;// Time remaining before next attack
     private GameObject target;
     private List<GameObject> enemiesInRange = new List<GameObject>();
-
     void Start(){
+        // Set the radius to the desired range
+        GetComponent<CircleCollider2D>().radius = range;
     }
 
     void Update(){
@@ -54,18 +55,20 @@ public class TowerManager : MonoBehaviour
     }
 
     // Detect enemies entering range
-    private void OnTriggerEnter(Collider other){
-        GameObject enemy = other.GetComponent<GameObject>();
+    private void OnTriggerEnter2D(Collider2D other){
+        GameObject enemy = other.gameObject;
         if (enemy != null){
             enemiesInRange.Add(enemy);
+            Debug.Log("Target in range");
         }
     }
 
     // Remove enemies that exit range
-    private void OnTriggerExit(Collider other){
-        GameObject enemy = other.GetComponent<GameObject>();
+    private void OnTriggerExit2D(Collider2D other){
+        GameObject enemy = other.gameObject;
         if (enemy != null){
             enemiesInRange.Remove(enemy);
+            Debug.Log("Target out of range");
         }
     }
 

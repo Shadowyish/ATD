@@ -9,6 +9,10 @@ public class EnemyManager : MonoBehaviour {
     private bool isAlive = true; // To check if the enemy is alive
     private List<Vector3> waypoints;
 
+    void Awake(){
+        waypoints = GridWaypointManager.Instance.GetWaypoints();
+        target = waypoints[1];
+    }
     void Update() {
         if (isAlive) {
             MoveTowardsTarget();
@@ -28,11 +32,12 @@ public class EnemyManager : MonoBehaviour {
 
     private void MoveTowardsTarget() {
         if (Vector3.Distance(transform.position, target) > 0.1f) {
-            // Calculate the rotation to look at the target
-            Quaternion targetRotation = Quaternion.LookRotation(target - transform.position);
-        
-            // Smoothly rotate towards the target rotation and move
+            Vector3 direction = (target - transform.position).normalized;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg; 
+            // Apply rotation only on the z-axis
+            Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, speed * Time.deltaTime);
+            // Move towards the target position
             transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);            
         } else {
             ReachTarget();
@@ -41,7 +46,10 @@ public class EnemyManager : MonoBehaviour {
 
     private void ReachTarget() {
         if(targetIndex + 1 >= waypoints.Count){
-            // Deal damage to main tower = to remaining health
+            if(MainTowerManager.Instance != null){
+                //inflict damage to main tower equal to remaining health
+                MainTowerManager.Instance.TakeDamage(health);
+            }
             Destroy(gameObject); // Destroy the enemy object upon reaching the target
         }else{
             targetIndex++;

@@ -11,14 +11,24 @@ public class Tile {
 
 // Grid tiles are calculated from the 0,0 of this object, make sure this object is placed on world origin
 public class GridWaypointManager : MonoBehaviour {
+    public static GridWaypointManager Instance { get; private set; }  // Singleton reference
     [SerializeField] private int gridWidth = 10;
     [SerializeField] private int gridHeight = 10;
     [SerializeField] private float tileSize = 1;
     [SerializeField] private GameObject tilePrefab;
-    private List<Vector3> currentWaypoints;
+    [SerializeField] private GameObject mainTowerPrefab;
+    private List<Vector3> currentWaypoints = new List<Vector3>();
     private Tile[,] grid; // 2D array to represent the grid
     private Tile mainTower;
-
+    
+    private void Awake() {
+        // Set this instance as the singleton instance
+        if (Instance == null) {
+            Instance = this;
+        } else {
+            Destroy(gameObject); // Prevent multiple instances
+        }
+    }
     void Start() {
         grid = new Tile[gridWidth, gridHeight];
         for (int x = 0; x < gridWidth; x++) {
@@ -26,11 +36,12 @@ public class GridWaypointManager : MonoBehaviour {
                 grid[x, y] = new Tile {
                     IsWalkable = true,
                     weight = 1,
-                    tile = Instantiate(tilePrefab, new Vector3(x - .5f, 0 - y - .5f, 0f), Quaternion.identity, transform)
+                    tile = Instantiate(tilePrefab, new Vector3(x + .5f,- y - .5f, 0f), Quaternion.identity, transform)
                 };
             }
         }
         mainTower = grid[(int) gridWidth/2, (int)gridHeight/2];
+        Instantiate(mainTowerPrefab, mainTower.tile.GetComponent<Transform>().position, Quaternion.identity);
     }
 
     // Method to update tile state (blocked/unblocked)
@@ -48,8 +59,8 @@ public class GridWaypointManager : MonoBehaviour {
 
     // Need a fix for this/ double check works TODO::
     public Tile GetTileFromWorldPosition(Vector3 position) {
-    	int x = Mathf.FloorToInt(position.x / tileSize);
-    	int y = Mathf.FloorToInt(-position.y / tileSize);
+    	int x = Mathf.FloorToInt((int)position.x/ tileSize);
+    	int y = Mathf.FloorToInt(-(int)position.y/ tileSize);
     	return grid[x, y]; 
     }
 
@@ -89,35 +100,34 @@ public class GridWaypointManager : MonoBehaviour {
         return chosenTile;
     }
 
-    private Tile GetLowestFCostTile(List<Tile> list) {
-        Tile lowest = list[0];
-        foreach (Tile tile in list) {
-            
-            if (getWeight(tile) < getWeight(lowest)) {
-                lowest = tile;
+    private Tile GetLowestFCostTile(Dictionary<Tile, int> toVisit) {
+        Tile lowest = null;
+        int lowestCost = int.MaxValue;
+        foreach (var kvp in toVisit) {
+            if (kvp.Value < lowestCost) {
+                lowestCost = kvp.Value;
+                lowest = kvp.Key;
             }
         }
         return lowest;
     }
 
     private int getWeight(Tile tile){
-        return tile.weight + (int)Math.Abs((mainTower.tile.GetComponent<Transform>().position.x - tile.tile.GetComponent<Transform>().position.x) + 
-        (mainTower.tile.GetComponent<Transform>().position.y - tile.tile.GetComponent<Transform>().position.y));
+        return tile.weight + (int)Math.Abs((mainTower.tile.GetComponent<Transform>().position.x - tile.tile.GetComponent<Transform>().position.x)) + 
+        (int)Math.Abs((-mainTower.tile.GetComponent<Transform>().position.y + tile.tile.GetComponent<Transform>().position.y));
     }
 
     private List<Tile> GetNeighbors(Tile tile) {
         List<Tile> neighbors = new List<Tile>();
         // Get tile's current grid coordinates
-        int x = Mathf.FloorToInt((tile.tile.GetComponent<Transform>().position.x) / tileSize);
-        int y = Mathf.FloorToInt((tile.tile.GetComponent<Transform>().position.y) / tileSize);
-
+        int x = Mathf.FloorToInt(((int)tile.tile.GetComponent<Transform>().position.x) / tileSize);
+        int y = Mathf.FloorToInt((- (int)tile.tile.GetComponent<Transform>().position.y) / tileSize);
         // Define potential neighboring positions (4-directional: up, down, left, right)
         int[,] directions = new int[,] { { 0, 1 }, { 0, -1 }, { 1, 0 }, { -1, 0 } };
 
         for (int i = 0; i < directions.GetLength(0); i++) {
             int neighborX = x + directions[i, 0];
             int neighborY = y + directions[i, 1];
-
             // Bounds checking
             if (neighborX >= 0 && neighborX < gridWidth && neighborY >= 0 && neighborY < gridHeight) {
                 Tile neighborTile = grid[neighborX, neighborY];
@@ -130,27 +140,25 @@ public class GridWaypointManager : MonoBehaviour {
     }
 
     private void AStar(Tile startTile) {
-    	List<Tile> toVisit = new List<Tile>();
+    	Dictionary<Tile, int> toVisit = new Dictionary<Tile, int>();
     	HashSet<Tile> visited = new HashSet<Tile>();
         Queue<Tile> pathTiles = new Queue<Tile>(); 
     	
-        toVisit.Add(startTile);
+        toVisit[startTile] = 0;
 
     	while (toVisit.Count > 0) {
             //pull next best tile from non-visited to explore
         	Tile currentTile = GetLowestFCostTile(toVisit);
-
-        	if (currentTile == mainTower) {
-            	currentWaypoints.Clear();                
-                while(pathTiles.Count !=0){
-                    //Retrace path: Might need to change, think this returns reversed path
-                    currentWaypoints.Add(pathTiles.Dequeue().tile.GetComponent<Transform>().position);
-                }
-        	}
-
             toVisit.Remove(currentTile);
             visited.Add(currentTile);
             pathTiles.Enqueue(currentTile);
+            Highlight(Color.green, currentTile);
+            if (currentTile.tile.GetComponent<Transform>().position == mainTower.tile.GetComponent<Transform>().position) {
+            	currentWaypoints.Clear();                
+                while(pathTiles.Count !=0){
+                    currentWaypoints.Add(pathTiles.Dequeue().tile.GetComponent<Transform>().position);
+                }return;
+        	}
 
             //check all the neighbor tiles for nodes to add/update.
             foreach (Tile neighbor in GetNeighbors(currentTile)) {
@@ -160,12 +168,18 @@ public class GridWaypointManager : MonoBehaviour {
                 
                 int newCostToNeighbor = getWeight(currentTile) + getWeight(neighbor);
                 //update old weight on unwalked node if better one found
-                if (newCostToNeighbor < getWeight(neighbor) || !toVisit.Contains(neighbor)) {
-                    neighbor.weight = newCostToNeighbor;
-                    if (!toVisit.Contains(neighbor)) {
-                        toVisit.Add(neighbor);
-                    }
+                if (!toVisit.ContainsKey(neighbor)|| newCostToNeighbor < toVisit[neighbor]) {
+                    toVisit[neighbor] = newCostToNeighbor;
                 }
+            }
+        }
+    }
+    //Used for debugging the A*
+    private void Highlight(Color color, Tile tile) {
+        if (tile.tile != null) {
+            Renderer renderer = tile.tile.GetComponent<Renderer>();
+            if (renderer != null) {
+                renderer.material.color = color; // Change the color of the tile
             }
         }
     }

@@ -46,7 +46,7 @@ public class BuildPhaseManager : MonoBehaviour {
 
     private void PlaceTower(Tile tile) {
         // Instantiate tower prefab and set position
-        Vector3 position = tile.centerPosition;
+        Vector3 position = tile.tile.GetComponent<Transform>().position;
         GameObject newTower = Instantiate(selectedTowerPrefab, position, Quaternion.identity);
         tile.IsWalkable = false; // Mark tile as blocked for pathfinding
     }

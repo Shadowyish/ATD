@@ -26,10 +26,11 @@ public class GridWaypointManager : MonoBehaviour {
                 grid[x, y] = new Tile {
                     IsWalkable = true,
                     weight = 1,
-                    tile = Instantiate(tilePrefab, new Vector3(x - .5f, y - .5f, 0f), Quaternion.identity);
+                    tile = Instantiate(tilePrefab, new Vector3(x - .5f, 0 - y - .5f, 0f), Quaternion.identity, transform)
                 };
             }
         }
+        mainTower = grid[(int) gridWidth/2, (int)gridHeight/2];
     }
 
     // Method to update tile state (blocked/unblocked)
@@ -48,7 +49,7 @@ public class GridWaypointManager : MonoBehaviour {
     // Need a fix for this/ double check works TODO::
     public Tile GetTileFromWorldPosition(Vector3 position) {
     	int x = Mathf.FloorToInt(position.x / tileSize);
-    	int y = Mathf.FloorToInt(position.y / tileSize);
+    	int y = Mathf.FloorToInt(-position.y / tileSize);
     	return grid[x, y]; 
     }
 
@@ -100,15 +101,15 @@ public class GridWaypointManager : MonoBehaviour {
     }
 
     private int getWeight(Tile tile){
-        return tile.weight + (int)Math.Abs((mainTower.tile.Transform.Position.x - tile.tile.Transform.Position.x) + 
-        (mainTower.centerPosition.y - tile.centerPosition.y));
+        return tile.weight + (int)Math.Abs((mainTower.tile.GetComponent<Transform>().position.x - tile.tile.GetComponent<Transform>().position.x) + 
+        (mainTower.tile.GetComponent<Transform>().position.y - tile.tile.GetComponent<Transform>().position.y));
     }
 
     private List<Tile> GetNeighbors(Tile tile) {
         List<Tile> neighbors = new List<Tile>();
         // Get tile's current grid coordinates
-        int x = Mathf.FloorToInt((tile.tile.Transform.Position.x) / tileSize);
-        int y = Mathf.FloorToInt((tile.tile.Transform.Position.y) / tileSize);
+        int x = Mathf.FloorToInt((tile.tile.GetComponent<Transform>().position.x) / tileSize);
+        int y = Mathf.FloorToInt((tile.tile.GetComponent<Transform>().position.y) / tileSize);
 
         // Define potential neighboring positions (4-directional: up, down, left, right)
         int[,] directions = new int[,] { { 0, 1 }, { 0, -1 }, { 1, 0 }, { -1, 0 } };
@@ -143,7 +144,7 @@ public class GridWaypointManager : MonoBehaviour {
             	currentWaypoints.Clear();                
                 while(pathTiles.Count !=0){
                     //Retrace path: Might need to change, think this returns reversed path
-                    currentWaypoints.Add(pathTiles.Dequeue().centerPosition);
+                    currentWaypoints.Add(pathTiles.Dequeue().tile.GetComponent<Transform>().position);
                 }
         	}
 

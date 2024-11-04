@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour {
     }
 
     private IEnumerator GameLoop() {
+        yield return new WaitForSeconds(3f);
         while (true) {
             switch (currentPhase) {
                 case GamePhase.GeneratePath:

@@ -6,7 +6,7 @@ using UnityEngine;
 public class Tile {
     public bool IsWalkable; // If the tile can be walked on
     public int weight; // Cost to move onto this tile
-    public Vector3 centerPosition;
+    public GameObject tile;
 }
 
 // Grid tiles are calculated from the 0,0 of this object, make sure this object is placed on world origin
@@ -14,6 +14,7 @@ public class GridWaypointManager : MonoBehaviour {
     [SerializeField] private int gridWidth = 10;
     [SerializeField] private int gridHeight = 10;
     [SerializeField] private float tileSize = 1;
+    [SerializeField] private GameObject tilePrefab;
     private List<Vector3> currentWaypoints;
     private Tile[,] grid; // 2D array to represent the grid
     private Tile mainTower;
@@ -25,7 +26,7 @@ public class GridWaypointManager : MonoBehaviour {
                 grid[x, y] = new Tile {
                     IsWalkable = true,
                     weight = 1,
-                    centerPosition = new Vector3( x - .5f, y -.5f , 0f) 
+                    tile = Instantiate(tilePrefab, new Vector3(x - .5f, y - .5f, 0f), Quaternion.identity);
                 };
             }
         }
@@ -99,15 +100,15 @@ public class GridWaypointManager : MonoBehaviour {
     }
 
     private int getWeight(Tile tile){
-        return tile.weight + (int)Math.Abs((mainTower.centerPosition.x - tile.centerPosition.x) + 
+        return tile.weight + (int)Math.Abs((mainTower.tile.Transform.Position.x - tile.tile.Transform.Position.x) + 
         (mainTower.centerPosition.y - tile.centerPosition.y));
     }
 
     private List<Tile> GetNeighbors(Tile tile) {
         List<Tile> neighbors = new List<Tile>();
         // Get tile's current grid coordinates
-        int x = Mathf.FloorToInt((tile.centerPosition.x) / tileSize);
-        int y = Mathf.FloorToInt((tile.centerPosition.y) / tileSize);
+        int x = Mathf.FloorToInt((tile.tile.Transform.Position.x) / tileSize);
+        int y = Mathf.FloorToInt((tile.tile.Transform.Position.y) / tileSize);
 
         // Define potential neighboring positions (4-directional: up, down, left, right)
         int[,] directions = new int[,] { { 0, 1 }, { 0, -1 }, { 1, 0 }, { -1, 0 } };

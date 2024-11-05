@@ -17,6 +17,8 @@ public class GridWaypointManager : MonoBehaviour {
     [SerializeField] private float tileSize = 1;
     [SerializeField] private GameObject tilePrefab;
     [SerializeField] private GameObject mainTowerPrefab;
+    [SerializeField] private Sprite EnemyPath;
+    [SerializeField] private Sprite BaseTile; 
     private List<Vector3> currentWaypoints = new List<Vector3>();
     private Tile[,] grid; // 2D array to represent the grid
     private Tile mainTower;
@@ -65,6 +67,7 @@ public class GridWaypointManager : MonoBehaviour {
     }
 
     public void GenerateEnemyPath(){
+        ResetPathVisualization();
         Tile start = GetRandomEdgeTile();
         AStar(start);
         //TODO: Highlight Path  
@@ -152,7 +155,7 @@ public class GridWaypointManager : MonoBehaviour {
             toVisit.Remove(currentTile);
             visited.Add(currentTile);
             pathTiles.Enqueue(currentTile);
-            Highlight(Color.green, currentTile);
+            ChangeTileType(currentTile, EnemyPath);
             if (currentTile.tile.GetComponent<Transform>().position == mainTower.tile.GetComponent<Transform>().position) {
             	currentWaypoints.Clear();                
                 while(pathTiles.Count !=0){
@@ -174,12 +177,22 @@ public class GridWaypointManager : MonoBehaviour {
             }
         }
     }
+    private void ResetPathVisualization(){
+        for(int i = 0; i < gridWidth; i++){
+            for(int j = 0; j < gridHeight; j++ ){
+                SpriteRenderer renderer = grid[i, j].tile.GetComponent<SpriteRenderer>();
+                if(renderer.sprite == EnemyPath){
+                    renderer.sprite = BaseTile;
+                }
+            }    
+        }   
+    }
     //Used for debugging the A*
-    private void Highlight(Color color, Tile tile) {
+    private void ChangeTileType(Tile tile, Sprite tileType) {
         if (tile.tile != null) {
-            Renderer renderer = tile.tile.GetComponent<Renderer>();
+            SpriteRenderer renderer = tile.tile.GetComponent<SpriteRenderer>();
             if (renderer != null) {
-                renderer.material.color = color; // Change the color of the tile
+                renderer.sprite = tileType; // Change the sprite of the tile
             }
         }
     }

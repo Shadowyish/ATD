@@ -309,6 +309,8 @@ MonoBehaviour:
   tileSize: 1
   tilePrefab: {fileID: 6158219953703486332, guid: 5912dc6df63feba4b85f4ab13a255cfa, type: 3}
   mainTowerPrefab: {fileID: 8038507045285476758, guid: 2407100e8ee1d1e4f90c7dbe5c4831ef, type: 3}
+  EnemyPath: {fileID: 21300000, guid: ed5abf166c844b84485f350ba7ef9e50, type: 3}
+  BaseTile: {fileID: 21300000, guid: 426984f861c2e754d9576765a6f5bfc8, type: 3}
 --- !u!1 &1284946092
 GameObject:
   m_ObjectHideFlags: 0

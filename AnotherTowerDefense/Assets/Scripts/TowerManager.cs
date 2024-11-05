@@ -59,7 +59,6 @@ public class TowerManager : MonoBehaviour
         GameObject enemy = other.gameObject;
         if (enemy != null){
             enemiesInRange.Add(enemy);
-            Debug.Log("Target in range");
         }
     }
 
@@ -68,7 +67,6 @@ public class TowerManager : MonoBehaviour
         GameObject enemy = other.gameObject;
         if (enemy != null){
             enemiesInRange.Remove(enemy);
-            Debug.Log("Target out of range");
         }
     }
 

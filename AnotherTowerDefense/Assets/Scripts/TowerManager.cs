@@ -10,6 +10,9 @@ public class TowerManager : MonoBehaviour
     private float fireCountdown = 0f;// Time remaining before next attack
     private GameObject target;
     private List<GameObject> enemiesInRange = new List<GameObject>();
+
+    public int getDamage(){return damage;}
+    public float getRange(){return range;}
     void Start(){
         // Set the radius to the desired range
         GetComponent<CircleCollider2D>().radius = range;

@@ -45,6 +45,7 @@ public class EnemyWaveManager : MonoBehaviour{
         return false;
     }
     private IEnumerator SpawnWaves(){
+        //Debug.Log($"TotalEnemies: {totalEnemies}, TotalWaves: {totalWaves}, EnemiesPerWave: {enemiesPerWave}");
         while (isSpawning){
             for (int i = 0; i < enemiesPerWave; i++){
                 SpawnEnemy(i);
@@ -52,18 +53,28 @@ public class EnemyWaveManager : MonoBehaviour{
             }
             yield return new WaitForSeconds(timeBetweenWaves); // Delay before the next wave
             currentWave++;
-            if(currentWave >= totalWaves)isSpawning = false;
+            if(currentWave >= totalWaves){
+                isSpawning = false;
+            }
         }
     }
 
     private void SpawnEnemy(int enemyInWave){
+        int index = enemiesPerWave * currentWave + enemyInWave;
+        //Debug.Log($"Index: {index}, ListSize: {currentEnemyList.Count}");
+        //ensure we don't try to spawn over the enemy array(not sure why my maths don't work?)
+        if(index >= currentEnemyList.Count){ 
+            Debug.LogError($"Attempted to spawn enemy at index {index}, but list size is {currentEnemyList.Count}. Skipping spawn.");
+            return;
+        }else if (currentEnemyList[index] == null){
+            
+        }
         Vector3 spawnPosition = currentWaypoints[0];
         Vector3 targetPosition = currentWaypoints[1];
         // Calculate the rotation to look at the second waypoint
         Quaternion rotation = Quaternion.LookRotation(targetPosition - spawnPosition);
         // Instantiate the enemy at the first waypoint and set its rotation
         // Take the instiated object and replace the prefab with it
-        int index = enemiesPerWave * currentWave + enemyInWave;
         currentEnemyList[index] = Instantiate(
             currentEnemyList[index], spawnPosition, rotation);
     }

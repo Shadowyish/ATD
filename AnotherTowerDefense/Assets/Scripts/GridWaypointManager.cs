@@ -49,10 +49,15 @@ public class GridWaypointManager : MonoBehaviour {
 
     // Method to update tile state (blocked/unblocked)
     // May expand later if needed
-    public void UpdateTileState(int x, int y, bool isWalkable) {
+    public void UpdateTileState(int x, int y, bool isWalkable, int weight) {
         if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
             grid[x, y].IsWalkable = isWalkable;
+            grid[x, y].weight = weight;
         }
+    }
+    
+    public Tile[,] getGrid(){
+        return grid;
     }
 
     // public method for enemies to pull the waypoints of generated path
@@ -68,7 +73,7 @@ public class GridWaypointManager : MonoBehaviour {
     }
 
     public void GenerateEnemyPath(){
-        ResetPathVisualization();
+        ResetEnemyPath();
         Tile start = GetRandomEdgeTile();
         AStar(start); 
     }
@@ -161,10 +166,11 @@ public class GridWaypointManager : MonoBehaviour {
                     pathTiles.Push(currentTile);
                     ChangeTileType(currentTile, EnemyPath);
                     currentTile = currentTile.parent;
-                }
-            	currentWaypoints.Clear();                
+                }               
                 while(pathTiles.Count !=0){
-                    currentWaypoints.Add(pathTiles.Pop().tile.GetComponent<Transform>().position);
+                    Tile pathTile = pathTiles.Pop();
+                    pathTile.IsWalkable = false;
+                    currentWaypoints.Add(pathTile.tile.GetComponent<Transform>().position);
                 }return;
         	}
 
@@ -182,7 +188,8 @@ public class GridWaypointManager : MonoBehaviour {
             }
         }
     }
-    private void ResetPathVisualization(){
+    private void ResetEnemyPath(){
+        //reset the vizualization
         for(int i = 0; i < gridWidth; i++){
             for(int j = 0; j < gridHeight; j++ ){
                 SpriteRenderer renderer = grid[i, j].tile.GetComponent<SpriteRenderer>();
@@ -190,7 +197,12 @@ public class GridWaypointManager : MonoBehaviour {
                     renderer.sprite = BaseTile;
                 }
             }    
-        }   
+        }
+        //reset the path lock and clear waypoints
+        foreach(Vector3 tilePosition in currentWaypoints){
+            GetTileFromWorldPosition(tilePosition).IsWalkable = true;
+        }
+        currentWaypoints.Clear();    
     }
     //Used for debugging the A*
     private void ChangeTileType(Tile tile, Sprite tileType) {

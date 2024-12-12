@@ -457,6 +457,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   towerPrefabs:
   - {fileID: 6133885291860141431, guid: 5534145da9c7ce14b9dca31c1b2524cc, type: 3}
+  - {fileID: 6133885291860141431, guid: f5061432d33830b4db203676af87448d, type: 3}
+  - {fileID: 6133885291860141431, guid: 13a164ddb3e68024988834eb676d781b, type: 3}
   towerSelectionPanel: {fileID: 157397392}
   towerButtons:
   - {fileID: 2023768619}
@@ -1871,6 +1873,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefabs:
   - {fileID: 1481301191107673992, guid: 18ff0c68ffc0d3f448732513d80d99c0, type: 3}
+  - {fileID: 1481301191107673992, guid: 7f81edf0e5ca28e46aa398db8b6020a7, type: 3}
+  - {fileID: 1481301191107673992, guid: 6ded5c17b88ce5443aa5cb8780ffb224, type: 3}
   timeBetweenWaves: 5
 --- !u!4 &2101262901
 Transform:

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MainTowerManager : MonoBehaviour{
     public static MainTowerManager Instance { get; private set; }  // Singleton reference
@@ -30,7 +31,7 @@ public class MainTowerManager : MonoBehaviour{
     }
     private void DestroyTower(){
         Debug.Log("Tower destroyed!");
-        // Insert logic here for game over
         Destroy(gameObject);
+        SceneManager.LoadScene("MainMenu");
     }
 }

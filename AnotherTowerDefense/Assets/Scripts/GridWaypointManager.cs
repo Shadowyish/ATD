@@ -7,6 +7,7 @@ public class Tile {
     public bool IsWalkable; // If the tile can be walked on
     public int weight; // Cost to move onto this tile
     public GameObject tile;
+    public Tile parent;
 }
 
 // Grid tiles are calculated from the 0,0 of this object, make sure this object is placed on world origin
@@ -69,8 +70,7 @@ public class GridWaypointManager : MonoBehaviour {
     public void GenerateEnemyPath(){
         ResetPathVisualization();
         Tile start = GetRandomEdgeTile();
-        AStar(start);
-        //TODO: Highlight Path  
+        AStar(start); 
     }
 
     private Tile GetRandomEdgeTile() {
@@ -143,23 +143,28 @@ public class GridWaypointManager : MonoBehaviour {
     }
 
     private void AStar(Tile startTile) {
+        foreach(Tile tile in grid){tile.parent = null;}
     	Dictionary<Tile, int> toVisit = new Dictionary<Tile, int>();
     	HashSet<Tile> visited = new HashSet<Tile>();
-        Queue<Tile> pathTiles = new Queue<Tile>(); 
+        Stack<Tile> pathTiles = new Stack<Tile>(); 
     	
         toVisit[startTile] = 0;
 
     	while (toVisit.Count > 0) {
             //pull next best tile from non-visited to explore
         	Tile currentTile = GetLowestFCostTile(toVisit);
+            int cost = toVisit[currentTile];
             toVisit.Remove(currentTile);
             visited.Add(currentTile);
-            pathTiles.Enqueue(currentTile);
-            ChangeTileType(currentTile, EnemyPath);
             if (currentTile.tile.GetComponent<Transform>().position == mainTower.tile.GetComponent<Transform>().position) {
+                while(currentTile.parent != null){
+                    pathTiles.Push(currentTile);
+                    ChangeTileType(currentTile, EnemyPath);
+                    currentTile = currentTile.parent;
+                }
             	currentWaypoints.Clear();                
                 while(pathTiles.Count !=0){
-                    currentWaypoints.Add(pathTiles.Dequeue().tile.GetComponent<Transform>().position);
+                    currentWaypoints.Add(pathTiles.Pop().tile.GetComponent<Transform>().position);
                 }return;
         	}
 
@@ -168,10 +173,10 @@ public class GridWaypointManager : MonoBehaviour {
                 if (!neighbor.IsWalkable || visited.Contains(neighbor)) {
                     continue; // Skip if not walkable or already evaluated
                 }
-                
-                int newCostToNeighbor = getWeight(currentTile) + getWeight(neighbor);
+                int newCostToNeighbor = cost + getWeight(neighbor);
                 //update old weight on unwalked node if better one found
                 if (!toVisit.ContainsKey(neighbor)|| newCostToNeighbor < toVisit[neighbor]) {
+                    neighbor.parent = currentTile;
                     toVisit[neighbor] = newCostToNeighbor;
                 }
             }

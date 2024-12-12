@@ -6,6 +6,8 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private GridWaypointManager waypointManager;
     [SerializeField] private EnemyWaveManager enemySpawner;
     [SerializeField] private BuildPhaseManager towerManager;
+    [SerializeField] private TMPro.TextMeshProUGUI mainTowerInfoText;
+    [SerializeField] private TMPro.TextMeshProUGUI GamePhaseInfoText;
     private int waveNumber = 1;   // Tracks the current wave number
     
     public enum GamePhase { GeneratePath, BuildPhase, WavePhase }
@@ -17,6 +19,10 @@ public class GameManager : MonoBehaviour {
     private void Start() {
         currentPhase = GamePhase.GeneratePath;
         StartCoroutine(GameLoop());
+    }
+    private void Update(){
+        mainTowerInfoText.text = $"Main Tower HP: {MainTowerManager.Instance.GetCurrentHealth()}/100";
+        GamePhaseInfoText.text = $"{currentPhase}";
     }
 
     private IEnumerator GameLoop() {

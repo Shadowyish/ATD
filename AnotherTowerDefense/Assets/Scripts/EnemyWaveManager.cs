@@ -18,7 +18,7 @@ public class EnemyWaveManager : MonoBehaviour{
     public void StartWaves(List<Vector3> waypoints, int waveNumber){
         if (!isSpawning){
             currentWave = 0;
-            totalWaves = Math.Max(1, waveNumber - UnityEngine.Random.Range(2, waveNumber));
+            totalWaves = Math.Max(1, waveNumber - UnityEngine.Random.Range(2, waveNumber -1));
             totalEnemies = waveNumber * 2 + totalWaves * totalWaves; // 2x + y^2
             enemiesPerWave = Mathf.FloorToInt(totalEnemies/totalWaves); // 2x+y^2 / y
 
@@ -63,15 +63,14 @@ public class EnemyWaveManager : MonoBehaviour{
         Quaternion rotation = Quaternion.LookRotation(targetPosition - spawnPosition);
         // Instantiate the enemy at the first waypoint and set its rotation
         // Take the instiated object and replace the prefab with it
-        currentEnemyList[enemiesPerWave * currentWave + enemyInWave] = Instantiate(
-            currentEnemyList[enemiesPerWave * currentWave + enemyInWave],
-            spawnPosition,
-            rotation);
+        int index = enemiesPerWave * currentWave + enemyInWave;
+        currentEnemyList[index] = Instantiate(
+            currentEnemyList[index], spawnPosition, rotation);
     }
 
     private void PopulateEnemyList(int totalEnemies) {
         currentEnemyList.Clear(); // Clear any existing enemies
-        for (int i = 0; i < totalEnemies; i++) {
+        for (int _ = 0; _ < totalEnemies; _++) {
             // Select a random enemy prefab
             GameObject enemy = enemyPrefabs[UnityEngine.Random.Range(0, enemyPrefabs.Count)]; 
             //add the prefab to the list       

@@ -378,6 +378,7 @@
 "Assets/Scripts/EnemyWaveManager.cs"
 "Assets/Scripts/GameManager.cs"
 "Assets/Scripts/GridWaypointManager.cs"
+"Assets/Scripts/MainMenu.cs"
 "Assets/Scripts/MainTowerManager.cs"
 "Assets/Scripts/TowerManager.cs"
 -langversion:9.0

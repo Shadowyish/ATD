@@ -2,67 +2,86 @@ using UnityEngine;
 using System.Collections.Generic;
 
 public class BuildPhaseManager : MonoBehaviour {
-    [SerializeField] private List<GameObject> towerPrefabs; 
+    [SerializeField] private List<GameObject> towerPrefabs;
+    [SerializeField] private GameObject towerSelectionPanel;
+    [SerializeField] private List<UnityEngine.UI.Button> towerButtons;
+    [SerializeField] private Sprite towerBuilt;
+    [SerializeField] private TMPro.TextMeshProUGUI placementInstructions;
+    private GameObject[] selectedTowerPrefabs = new GameObject[3];
     private GameObject selectedTowerPrefab;
     private bool isPlacementActive = false;
     private bool isPlacementConfirmed = false;
     private GridWaypointManager gridManager;
 
-    //Load UI and Placement Visualizations
     public void StartPlacementMode(GridWaypointManager gridManager) {
         isPlacementActive = true;
         isPlacementConfirmed = false;
         this.gridManager = gridManager;
         SelectTower();
+        placementInstructions.gameObject.SetActive(true);
     }
-
     void Update() {
         if (isPlacementActive) {
             HandleTowerPlacement();
         }
     }
-
     //Load UI screen for Tower Selection
-    private void SelectTower() {
-        // For now, pick a random tower
-        int randomIndex = Random.Range(0, towerPrefabs.Count);
-        selectedTowerPrefab = towerPrefabs[randomIndex];
-        Debug.Log("Selected Tower: " + selectedTowerPrefab.name);
-    }
+    private void SelectTower() {      
+        HashSet<int> selectedIndices = new HashSet<int>();
+        while (selectedIndices.Count < 3) {
+            int randomIndex = Random.Range(0, towerPrefabs.Count);
+            //if (!selectedIndices.Contains(randomIndex)) {
+                selectedIndices.Add(randomIndex);
+        }
 
+        int i = 0;
+        foreach (int index in selectedIndices) {
+            selectedTowerPrefabs[i] = towerPrefabs[index];
+            towerButtons[i].GetComponentInChildren<UnityEngine.UI.Text>().text = towerPrefabs[index].name; // Update button text
+            towerButtons[i].onClick.RemoveAllListeners();
+            int buttonIndex = i; // Cache index to avoid closure issue in C#
+            towerButtons[i].onClick.AddListener(() => SelectTowerFromUI(buttonIndex));
+            i++;
+        }
+        towerSelectionPanel.SetActive(true); // Show the selection panel
+    }
     private void HandleTowerPlacement() {
         // Check for mouse click
         if (Input.GetMouseButtonDown(0)) {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Tile targetTile = gridManager.GetTileFromWorldPosition(mousePosition);
-            //TODO: Vizualize Space Selected
             if(targetTile != null && targetTile.IsWalkable) {
+                SpriteRenderer renderer = targetTile.tile.GetComponent<SpriteRenderer>();
+                if (renderer != null) {
+                    renderer.sprite = towerBuilt; // Change the sprite of the tile
+                }
                 PlaceTower(targetTile);
                 ConfirmPlacement();
             }
         }
     }
-
     private void PlaceTower(Tile tile) {
         // Instantiate tower prefab and set position
         Vector3 position = tile.tile.GetComponent<Transform>().position;
         GameObject newTower = Instantiate(selectedTowerPrefab, position, Quaternion.identity);
         tile.IsWalkable = false; // Mark tile as blocked for pathfinding
     }
-
     // Call this to confirm the placement phase
     public void ConfirmPlacement() {
         isPlacementConfirmed = true;
         isPlacementActive = false;
+        placementInstructions.gameObject.SetActive(false);
     }
-
     // Accessed by GameManager to check if placement is confirmed
     public bool IsPlacementConfirmed() {
         return isPlacementConfirmed;
     }
-
-    //shell function will use to end placement UI to trasition to wave UI
-    public void EndPlacementMode() {
-        isPlacementActive = false;
+    public void SelectTowerFromUI(int towerIndex) {
+    selectedTowerPrefab = selectedTowerPrefabs[towerIndex];
+    towerSelectionPanel.SetActive(false); // Hide the panel after selection
     }
+    //shell function to ensure lock for wave phase
+    public void EndPlacementMode() { 
+        isPlacementActive = false; 
+    } 
 }

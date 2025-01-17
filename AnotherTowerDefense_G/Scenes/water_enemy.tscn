@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://bs55wqud1vwqo"]
+
+[ext_resource type="PackedScene" uid="uid://b5l6xup7h7ch4" path="res://Scenes/basic_enemy.tscn" id="1_ryv60"]
+
+[node name="Water Enemy" instance=ExtResource("1_ryv60")]
+speed = 1.25
+health = 15
+
+[node name="Sprite2D" parent="." index="0"]
+self_modulate = Color(0, 0.882353, 1, 1)
+
+[node name="Area2D" parent="." index="1"]
+visible = false

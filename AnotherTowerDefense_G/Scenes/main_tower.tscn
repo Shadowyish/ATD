@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://8new4mmifwoh"]
+
+[ext_resource type="Texture2D" uid="uid://dbj2y6ogwna0n" path="res://Sprites/Tower_Main.png" id="1_2oi12"]
+[ext_resource type="Script" path="res://Scripts/Tower_Manager.gd" id="1_goj47"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qgotr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yo6io"]
+
+[node name="MainTower" type="Node2D"]
+script = ExtResource("1_goj47")
+range = 10.0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_2oi12")
+
+[node name="TowerRange" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TowerRange"]
+scale = Vector2(150, 150)
+shape = SubResource("CircleShape2D_qgotr")
+
+[node name="TowerHitbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TowerHitbox"]
+scale = Vector2(10, 10)
+shape = SubResource("RectangleShape2D_yo6io")
+debug_color = Color(0.894118, 0.278431, 0.415686, 0.419608)

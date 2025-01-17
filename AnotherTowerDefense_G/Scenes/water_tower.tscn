@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://btlbly37w6yds"]
+
+[ext_resource type="PackedScene" uid="uid://8new4mmifwoh" path="res://Scenes/main_tower.tscn" id="1_xd3hj"]
+
+[node name="Water Tower" instance=ExtResource("1_xd3hj")]
+damage = 5
+max_health = 15
+
+[node name="Sprite2D" parent="." index="0"]
+self_modulate = Color(0, 0.882353, 1, 1)

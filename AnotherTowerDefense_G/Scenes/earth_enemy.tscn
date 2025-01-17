@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://c2rheq5d7y04g"]
+
+[ext_resource type="PackedScene" uid="uid://b5l6xup7h7ch4" path="res://Scenes/basic_enemy.tscn" id="1_6tre5"]
+
+[node name="Earth Enemy" instance=ExtResource("1_6tre5")]
+speed = 0.5
+health = 30
+
+[node name="Sprite2D" parent="." index="0"]
+self_modulate = Color(0.447059, 0.223529, 0.027451, 1)

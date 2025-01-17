@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://fjth7hyfkfdt"]
+
+[ext_resource type="PackedScene" uid="uid://8new4mmifwoh" path="res://Scenes/main_tower.tscn" id="1_jb1ir"]
+
+[node name="Fire Tower" instance=ExtResource("1_jb1ir")]
+fire_rate = 0.5
+damage = 2
+range = 5.0
+max_health = 10
+
+[node name="Sprite2D" parent="." index="0"]
+self_modulate = Color(0.8, 0.00392157, 0, 1)
